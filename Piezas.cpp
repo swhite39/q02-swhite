@@ -22,6 +22,14 @@
 **/
 Piezas::Piezas()
 {
+  for(int i=0; i < BOARD_ROWS; i++)
+  {
+    for(int j=0; j < BOARD_COLS;j++)
+    {
+      board[i][j] = Blank;  
+    }  
+  }
+  turn = X;
 }
 
 /**
@@ -30,6 +38,13 @@ Piezas::Piezas()
 **/
 void Piezas::reset()
 {
+  for(int i=0; i < BOARD_ROWS; i++)
+  {
+    for(int j=0; j < BOARD_COLS;j++)
+    {
+      board[i][j] = Blank;  
+    }  
+  }
 }
 
 /**
@@ -42,7 +57,44 @@ void Piezas::reset()
 **/ 
 Piece Piezas::dropPiece(int column)
 {
-    return Blank;
+  // If column is out of bounds return Invalid and the player forfeits their turn
+  if(column > 3)
+  {
+    if(turn == X)
+      turn = O;
+    else if(turn == O)
+      turn = X;
+    return Invalid;
+  }
+
+  // Iterate through rows and try to set the appropriate piece on the board
+  for(int i=0; i < BOARD_ROWS; i++)
+  {
+    if(board[i][column] == O || board[i][column] == X)
+      continue;
+    else if(board[i][column] == Blank)
+    {
+      if(turn == X)
+      {
+        board[i][column] = X;
+        turn = O;
+        return X;
+      }
+      else if(turn == O)
+      {
+        board[i][column] = O;
+        turn = X;
+        return O;
+      }
+    }
+  }
+
+  //If you made it this far the column is full so forfeit turn and return Blank
+  if(turn == X)
+    turn = O;
+  else if(turn == O)
+    turn = X;
+  return Blank;
 }
 
 /**
@@ -51,6 +103,13 @@ Piece Piezas::dropPiece(int column)
 **/
 Piece Piezas::pieceAt(int row, int column)
 {
+  if(column > 3 || column < 0 || row > 2 || row < 0)
+    return Invalid;
+  else if(board[row][column] == O)
+    return O;
+  else if(board[row][column] == X)
+    return X;
+  else 
     return Blank;
 }
 
@@ -65,5 +124,53 @@ Piece Piezas::pieceAt(int row, int column)
 **/
 Piece Piezas::gameState()
 {
+  unsigned int tempX = 0;
+  unsigned int tempO = 0;
+  unsigned int maxX = 0;
+  unsigned int maxO = 0;
+  // Ensure the game is over and check max number of columns
+  for(int i=0; i < BOARD_ROWS; i++)
+  {
+    for(int j=0; j < BOARD_COLS;j++)
+    {
+      if(board[i][j] == Blank || board[i][j] == Invalid)
+        return Invalid;
+      else if(board[i][j] == X)
+        tempX++;
+      else if(board[i][j] == O)
+        tempO++; 
+    }
+    if(tempX > maxX)
+      maxX  = tempX;
+    if(tempO > maxO)
+      maxO = tempO;
+    tempX = 0;
+    tempO = 0;
+  }
+
+  // Check the max number of rows
+  for(int i=0; i < BOARD_COLS; i++)
+  {
+    for(int j=0; j < BOARD_ROWS;j++)
+    {
+      if(board[j][i] == X)
+        tempX++;
+      else if(board[j][i] == O)
+        tempO++; 
+    }
+    if(tempX > maxX)
+      maxX  = tempX;
+    if(tempO > maxO)
+      maxO = tempO;
+    tempX = 0;
+    tempO = 0;
+  }
+
+  // Check to see who the winner is
+  if(maxX == maxO)
     return Blank;
+  else if(maxX > maxO)
+    return X;
+  else if(maxX < maxO)
+    return O;
 }
