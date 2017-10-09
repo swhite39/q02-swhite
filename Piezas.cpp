@@ -22,12 +22,14 @@
 **/
 Piezas::Piezas()
 {
+  std::vector<Piece> column;
   for(int i=0; i < BOARD_ROWS; i++)
   {
     for(int j=0; j < BOARD_COLS;j++)
     {
-      board[i][j] = Blank;  
-    }  
+      column.push_back(Blank);  
+    }
+    board.push_back(column);  
   }
   turn = X;
 }
@@ -58,7 +60,7 @@ void Piezas::reset()
 Piece Piezas::dropPiece(int column)
 {
   // If column is out of bounds return Invalid and the player forfeits their turn
-  if(column > 3)
+  if(column > 3 || column < 0)
   {
     if(turn == X)
       turn = O;
@@ -105,12 +107,8 @@ Piece Piezas::pieceAt(int row, int column)
 {
   if(column > 3 || column < 0 || row > 2 || row < 0)
     return Invalid;
-  else if(board[row][column] == O)
-    return O;
-  else if(board[row][column] == X)
-    return X;
   else 
-    return Blank;
+    return board[row][column];
 }
 
 /**
@@ -171,6 +169,6 @@ Piece Piezas::gameState()
     return Blank;
   else if(maxX > maxO)
     return X;
-  else if(maxX < maxO)
+  else
     return O;
 }
